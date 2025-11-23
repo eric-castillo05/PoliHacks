@@ -220,44 +220,35 @@ import asyncio
 
 async def websocket_handler(websocket):
     logger.info("WebSocket client connected")
-    import io
-    from PIL import Image
-    import random
     try:
         async for message in websocket:
-            logger.debug(f"Received frame of size {len(message)} bytes")
-            # Decode JPEG frame
+            logger.debug(f"Received WebSocket message (ignored, using /dev/video0)")
+            env = os.environ.copy()
+            env['DISPLAY'] = ''
+            env['QT_QPA_PLATFORM'] = 'offscreen'
             try:
-                img = Image.open(io.BytesIO(message))
-                logger.info(f"Frame decoded: {img.size}, mode: {img.mode}")
+                result = subprocess.run(
+                    [BINARY_PATH, API_KEY],
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                    env=env
+                )
+                logger.info(f"Binary stdout: {result.stdout}")
+                if result.returncode == 0:
+                    try:
+                        metrics_data = json.loads(result.stdout)
+                        await websocket.send(json.dumps(metrics_data))
+                        logger.info(f"Sent metrics JSON to frontend: {json.dumps(metrics_data, indent=2)}")
+                    except Exception as e:
+                        logger.error(f"Error parsing binary output: {e}")
+                        await websocket.send(json.dumps({"error": "Invalid JSON from binary", "raw_output": result.stdout}))
+                else:
+                    logger.error(f"Binary failed: {result.stderr}")
+                    await websocket.send(json.dumps({"error": "Binary execution failed", "stderr": result.stderr}))
             except Exception as e:
-                logger.error(f"Error decoding frame: {e}")
-                continue
-            # Generate mock metrics (simulate ML)
-            mock_metrics = {
-                "status": "success",
-                "timestamp": int(time.time()),
-                "duration_seconds": 1,
-                "heart_rate": {
-                    "value": random.randint(60, 85),
-                    "unit": "bpm",
-                    "confidence": round(random.uniform(0.85, 0.98), 2)
-                },
-                "breathing_rate": {
-                    "value": random.randint(12, 18),
-                    "unit": "breaths/min",
-                    "confidence": round(random.uniform(0.80, 0.95), 2)
-                },
-                "hrv": {
-                    "value": random.randint(30, 80),
-                    "unit": "ms",
-                    "confidence": round(random.uniform(0.75, 0.90), 2)
-                }
-            }
-            # Log full metrics JSON for inspection
-            logger.info(f"Sending metrics: {json.dumps(mock_metrics, indent=2)}")
-            # Send metrics back to client
-            await websocket.send(json.dumps(mock_metrics))
+                logger.error(f"Error running binary: {e}")
+                await websocket.send(json.dumps({"error": str(e)}))
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
 
