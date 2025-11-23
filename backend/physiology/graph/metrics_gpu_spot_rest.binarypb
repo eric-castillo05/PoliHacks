@@ -1,4 +1,0 @@
-
-ËPreprocessingGpuSpotJsonINPUT_VIDEO:input_videoRECORDING:recording"OUTPUT_VIDEO:output_video")DENSE_FACE_LANDMARKS:dense_face_landmarks"TIME_LEFT:time_left_s"STATUS_CODE:status_code"#PREPROCESSED_DATA:preprocessed_data"BLUE_TOOTH:blue_tooth"%FRAME_SENT_THROUGH:frame_sent_through*!ENABLE_PHASIC_BP:enable_phasic_bp*ENABLE_EDA:enable_eda*API_KEY:api_key*MODEL_DIRECTORY:model_directory*SAVE_ROI_IMAGE:save_roi_image*SPOT_DURATION:spot_duration_s
-_SpotMetricsRestCalculator#PREPROCESSED_DATA:preprocessed_data"METRICS_BUFFER:metrics_bufferRinput_videoR	recordingzoutput_videozstatus_codeztime_left_sz
-blue_toothz)DENSE_FACE_LANDMARKS:dense_face_landmarkszMETRICS_BUFFER:metrics_bufferz%FRAME_SENT_THROUGH:frame_sent_through‚spot_duration_s‚enable_phasic_bp‚ENABLE_EDA:enable_eda‚API_KEY:api_key‚MODEL_DIRECTORY:model_directory‚SAVE_ROI_IMAGE:save_roi_image
