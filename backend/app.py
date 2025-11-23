@@ -1,3 +1,55 @@
+from transformers import AutoProcessor, AutoModelForAudioClassification
+import torch
+import librosa
+import tempfile
+
+# Load emotion detection model
+processor = AutoProcessor.from_pretrained("Hatman/audio-emotion-detection")
+model = AutoModelForAudioClassification.from_pretrained("Hatman/audio-emotion-detection")
+
+# In-memory store for transcript/emotion intervals
+emotion_log = []
+
+@app.route('/analyze-audio', methods=['POST'])
+def analyze_audio():
+    """
+    Receives audio (webm/wav), transcribes, runs emotion detection, and saves transcript/emotion per 15s interval.
+    Expects form-data: audio=<file>, transcript=<text>, interval_start=<int>, interval_end=<int>
+    """
+    try:
+        audio_file = request.files.get('audio')
+        transcript = request.form.get('transcript', '')
+        interval_start = int(request.form.get('interval_start', 0))
+        interval_end = int(request.form.get('interval_end', 0))
+        if not audio_file:
+            return jsonify({'error': 'No audio file provided'}), 400
+
+        # Save audio to temp file
+        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_audio:
+            audio_path = temp_audio.name
+            audio_file.save(audio_path)
+
+        # Load audio and preprocess
+        audio, sr = librosa.load(audio_path, sr=16000)
+        inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
+        with torch.no_grad():
+            logits = model(**inputs).logits
+            predicted_id = torch.argmax(logits, dim=-1).item()
+            emotion = model.config.id2label[predicted_id]
+
+        # Save result in memory (could be DB)
+        entry = {
+            'interval_start': interval_start,
+            'interval_end': interval_end,
+            'transcript': transcript,
+            'emotion': emotion
+        }
+        emotion_log.append(entry)
+
+        return jsonify(entry), 200
+    except Exception as e:
+        logger.exception(f"Error in analyze_audio: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import subprocess
