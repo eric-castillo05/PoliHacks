@@ -254,6 +254,8 @@ async def websocket_handler(websocket):
                     "confidence": round(random.uniform(0.75, 0.90), 2)
                 }
             }
+            # Log full metrics JSON for inspection
+            logger.info(f"Sending metrics: {json.dumps(mock_metrics, indent=2)}")
             # Send metrics back to client
             await websocket.send(json.dumps(mock_metrics))
     except Exception as e:
