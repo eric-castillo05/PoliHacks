@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CameraPanel from '../components/CameraPanel.jsx'
-
+import VoiceOrb from '../components/VoiceOrb.jsx'
 
 const INITIAL_SECONDS = 15
 
@@ -25,7 +25,7 @@ function BlankPage() {
 
                 const widget = document.createElement("elevenlabs-convai")
                 widget.setAttribute("agent-id", "agent_2601kar32vt7eb288b41ttpb0fvp")
-                widget.setAttribute("style", "position:absolute; top: 300px; right: 100px; width:300px; height:400px; ")
+                widget.setAttribute("style", "position:absolute; top: 300px; right: 100px; width:500px; height:400px; ")
 
                 widget.addEventListener("ready", () => {
                     console.log("Widget listo!");
@@ -35,7 +35,7 @@ function BlankPage() {
                     const text = event.detail?.output?.formatted?.text;
 
                     if (text) {
-                        console.log("🟢 Texto en tiempo real:", text);
+                        console.log("Texto en tiempo real:", text);
                         setAgentMessage(text);
                     }
                 });
@@ -116,15 +116,19 @@ function BlankPage() {
                                         </div>
                                     )}
 
-                                    {/* Widget Area */}
-                                    <div className="rounded-2xl bg-gradient-to-br from-slate-100/50 to-slate-50/50 p-6 border border-slate-200/50 shadow-sm">
-                                         <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 to-emerald-700 bg-clip-text text-transparent mb-2 px-9 py-3">
-                                    ¿Qué algoritmo te gusta?
-                                    </h2>
-                                    
-                                    <div className="h-1 w-180 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" />
-                                            
-                                        </div>
+                                    {/* Widget Area / Main Area */}
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-100/50 to-slate-50/50 p-6 border border-slate-200/50 shadow-sm flex flex-col items-center gap-6">
+                                      <div className="w-full text-center">
+                                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-900 to-emerald-700 bg-clip-text text-transparent mb-3 pb-8 ">
+                                          ¿Qué algoritmo te gusta?
+                                        </h2>
+                                        <div className="mx-auto h-1 w-40 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full " />
+                                      </div>
+
+                                      <div className="py-10">
+                                      <VoiceOrb />
+                                      </div>
+                                    </div>
                                 </div>
 
                                 {/* RIGHT - Camera */}
@@ -149,8 +153,8 @@ function BlankPage() {
                                     <p className="text-xs text-blue-600">Respuestas en tiempo real</p>
                                 </div>
                                 <div className="rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/30 p-4 border border-purple-200/40">
-                                    <h4 className="font-semibold text-purple-700 mb-1 text-sm">Cronometrado</h4>
-                                    <p className="text-xs text-purple-600">{INITIAL_SECONDS} segundos por sesión</p>
+                                    <h4 className="font-semibold text-purple-700 mb-1 text-sm">Ayuda</h4>
+                                    <p className="text-xs text-purple-600">Te ayuda a mejorar para tu proxima entrevista</p>
                                 </div>
                             </div>
                         </div>
