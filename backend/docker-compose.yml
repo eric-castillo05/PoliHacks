@@ -1,22 +1,9 @@
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: vitals-backend
+  flask_app:
+    build: .
+    container_name: flask_app
     ports:
       - "5000:5000"
     environment:
-      - SMARTSPECTRA_API_KEY=${SMARTSPECTRA_API_KEY}
-    devices:
-      - /dev/video0:/dev/video0  # Dar acceso a la cámara
-    volumes:
-      - ./app.py:/app/app.py  # Para desarrollo: hot reload
-    restart: unless-stopped
-    privileged: true  # Necesario para acceso a dispositivos
-    networks:
-      - vitals-network
-
-networks:
-  vitals-network:
-    driver: bridge
+      - FLASK_ENV=production
+    restart: always

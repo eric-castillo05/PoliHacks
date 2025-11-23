@@ -184,13 +184,7 @@ function BlankPage() {
                         </button>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={() => navigate('/next')}
-                        className="inline-flex items-center justify-center rounded-lg border-2 border-slate-900 px-5 py-2.5 text-sm font-bold bg-white text-slate-900 hover:bg-slate-900 hover:text-white transition shadow-sm"
-                    >
-                        Next
-                    </button>
+
                 </div>
             </div>
         </div>

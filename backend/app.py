@@ -1,15 +1,46 @@
-from transformers import AutoProcessor, AutoModelForAudioClassification
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from transformers import Wav2Vec2FeatureExtractor, AutoModelForAudioClassification
 import torch
 import librosa
 import tempfile
-from flask import app
+import subprocess
+import json
+import os
+import logging
+import time
+import threading
+import asyncio
 
-# Load emotion detection model
-processor = AutoProcessor.from_pretrained("Hatman/audio-emotion-detection")
-model = AutoModelForAudioClassification.from_pretrained("Hatman/audio-emotion-detection")
+# Initialize Flask App
+app = Flask(__name__)
+CORS(app)
+
+# Configurar logging más detallado
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# --- Emotion Detection Setup ---
+# Use Wav2Vec2FeatureExtractor instead of AutoProcessor to avoid "pyctcdecode" dependency error
+try:
+    processor = Wav2Vec2FeatureExtractor.from_pretrained("Hatman/audio-emotion-detection")
+    model = AutoModelForAudioClassification.from_pretrained("Hatman/audio-emotion-detection")
+except Exception as e:
+    logger.error(f"Failed to load emotion detection model: {e}")
+    processor = None
+    model = None
 
 # In-memory store for transcript/emotion intervals
 emotion_log = []
+
+# --- Vitals App Config ---
+BINARY_PATH = "/app/hello_vitals"
+API_KEY = os.getenv("SMARTSPECTRA_API_KEY", "")
+
+# --- Routes ---
 
 @app.route('/analyze-audio', methods=['POST'])
 def analyze_audio():
@@ -17,6 +48,9 @@ def analyze_audio():
     Receives audio (webm/wav), transcribes, runs emotion detection, and saves transcript/emotion per 15s interval.
     Expects form-data: audio=<file>, transcript=<text>, interval_start=<int>, interval_end=<int>
     """
+    if not processor or not model:
+        return jsonify({'error': 'Emotion model not loaded'}), 500
+
     try:
         audio_file = request.files.get('audio')
         transcript = request.form.get('transcript', '')
@@ -30,29 +64,34 @@ def analyze_audio():
             audio_path = temp_audio.name
             audio_file.save(audio_path)
 
-        # Load audio and preprocess
-        audio, sr = librosa.load(audio_path, sr=16000)
-        inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
-        with torch.no_grad():
-            logits = model(**inputs).logits
-            predicted_id = torch.argmax(logits, dim=-1).item()
-            emotion = model.config.id2label[predicted_id]
+        try:
+            # Load audio and preprocess
+            audio, sr = librosa.load(audio_path, sr=16000)
+            inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
+            with torch.no_grad():
+                logits = model(**inputs).logits
+                predicted_id = torch.argmax(logits, dim=-1).item()
+                emotion = model.config.id2label[predicted_id]
 
-        # Save result in memory (could be DB)
-        entry = {
-            'interval_start': interval_start,
-            'interval_end': interval_end,
-            'transcript': transcript,
-            'emotion': emotion
-        }
-        emotion_log.append(entry)
+            # Save result in memory (could be DB)
+            entry = {
+                'interval_start': interval_start,
+                'interval_end': interval_end,
+                'transcript': transcript,
+                'emotion': emotion
+            }
+            emotion_log.append(entry)
 
-        return jsonify(entry), 200
+            return jsonify(entry), 200
+        finally:
+            # Clean up temp file
+            if os.path.exists(audio_path):
+                os.remove(audio_path)
+
     except Exception as e:
         logger.exception(f"Error in analyze_audio: {str(e)}")
         return jsonify({'error': str(e)}), 500
-from flask import Flask, jsonify, request, app
-from flask_cors import CORS
+
 import subprocess
 import json
 import os
