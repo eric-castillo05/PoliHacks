@@ -2,6 +2,7 @@ from transformers import AutoProcessor, AutoModelForAudioClassification
 import torch
 import librosa
 import tempfile
+from flask import app
 
 # Load emotion detection model
 processor = AutoProcessor.from_pretrained("Hatman/audio-emotion-detection")
@@ -50,7 +51,7 @@ def analyze_audio():
     except Exception as e:
         logger.exception(f"Error in analyze_audio: {str(e)}")
         return jsonify({'error': str(e)}), 500
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, app
 from flask_cors import CORS
 import subprocess
 import json
@@ -313,14 +314,6 @@ def start_websocket_server():
     asyncio.run(run_server())
 
 if __name__ == '__main__':
-    # Verificar al inicio que el binario existe
-    if os.path.exists(BINARY_PATH):
-        logger.info(f"✓ Binario encontrado en {BINARY_PATH}")
-        logger.info(f"✓ Permisos: {oct(os.stat(BINARY_PATH).st_mode)}")
-        logger.info(f"✓ Ejecutable: {os.access(BINARY_PATH, os.X_OK)}")
-    else:
-        logger.warning(f"⚠ Binario NO encontrado en {BINARY_PATH}")
-    
     if API_KEY:
         logger.info(f"✓ API Key configurada (longitud: {len(API_KEY)})")
     else:

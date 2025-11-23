@@ -3,4 +3,5 @@ build
 .git
 .gitignore
 Dockerfile
-nginx.conf
+# Do not ignore nginx.conf; it is required during the image build to configure Nginx
+# nginx.conf
