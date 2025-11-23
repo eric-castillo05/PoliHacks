@@ -25,7 +25,7 @@ function BlankPage() {
 
                 const widget = document.createElement("elevenlabs-convai")
                 widget.setAttribute("agent-id", "agent_2601kar32vt7eb288b41ttpb0fvp")
-                widget.setAttribute("style", "position:absolute; top: 300px; right: 100px; width:500px; height:400px; ")
+                widget.setAttribute("style", "position:absolute; top: -20px; right: 100px; width:500px; height:400px; ")
 
                 widget.addEventListener("ready", () => {
                     console.log("Widget listo!");
@@ -120,7 +120,7 @@ function BlankPage() {
                                     <div className="rounded-2xl bg-gradient-to-br from-slate-100/50 to-slate-50/50 p-6 border border-slate-200/50 shadow-sm flex flex-col items-center gap-6">
                                       <div className="w-full text-center">
                                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-900 to-emerald-700 bg-clip-text text-transparent mb-3 pb-8 ">
-                                          ¿Qué algoritmo te gusta?
+                                          Responde a la siguientes preguntas, puedes parar si dices "Termina entrevista"
                                         </h2>
                                         <div className="mx-auto h-1 w-40 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full " />
                                       </div>
@@ -136,14 +136,14 @@ function BlankPage() {
                                     <div className="w-full rounded-2xl overflow-hidden shadow-lg border-4 border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-blue-500/10">
                                         <CameraPanel />
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-4 text-center">Cámara en vivo</p>
+                                   
                                     <div id="widgetArea" className="flex justify-center" />
                                 </div>
 
                             </div>
 
                             {/* INFO CARDS */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-35">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-7">
                                 <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/30 p-4 border border-emerald-200/40">
                                     <h4 className="font-semibold text-emerald-700 mb-1 text-sm">Conversación en vivo</h4>
                                     <p className="text-xs text-emerald-600">Interactúa con IA mediante voz</p>
