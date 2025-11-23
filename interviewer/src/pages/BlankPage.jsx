@@ -8,6 +8,44 @@ function BlankPage() {
     const [secondsLeft, setSecondsLeft] = useState(INITIAL_SECONDS)
     const [isRunning, setIsRunning] = useState(false)
     const navigate = useNavigate()
+    const [agentMessage, setAgentMessage] = useState("")
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (customElements.get("elevenlabs-convai")) {
+                console.log("Widget detectado");
+                clearInterval(interval)
+
+                const container = document.getElementById("widgetArea")
+
+                if (!container) return
+
+                container.innerHTML = ""
+
+                const widget = document.createElement("elevenlabs-convai")
+                widget.setAttribute("agent-id", "agent_2601kar32vt7eb288b41ttpb0fvp")
+                widget.setAttribute("style", "position:relative; width:300px; height:400px;")
+
+                widget.addEventListener("ready", () => {
+                    console.log("Widget listo!");
+                });
+
+                widget.addEventListener("conversation-item-added", (event) => {
+                    const text = event.detail?.item?.formatted?.text;
+                    console.log("📩 EVENTO conversation-item-added:", event.detail);
+                    console.log("📝 TEXTO DETECTADO:", text);
+
+                    if (text) {
+                        setAgentMessage(text);
+                    }
+                });
+
+                container.appendChild(widget)
+            }
+        }, 500)
+
+        return () => clearInterval(interval)
+    }, [])
 
     useEffect(() => {
         if (!isRunning) return
@@ -18,7 +56,7 @@ function BlankPage() {
         }
 
         const id = setInterval(() => {
-            setSecondsLeft((prev) => prev - 1)
+            setSecondsLeft(prev => prev - 1)
         }, 1000)
 
         return () => clearInterval(id)
@@ -32,61 +70,112 @@ function BlankPage() {
     const progress = secondsLeft / INITIAL_SECONDS
 
     return (
-        <div className="w-screen h-screen flex flex-col bg-white text-black overflow-hidden ">
+        <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-emerald-50 text-black overflow-hidden">
+            
             {/* TOP PROGRESS BAR */}
-            <div className="w-full px-4 pt-4">
-                <div className="max-w-5xl mx-auto flex flex-col items-center">
-                    <div className="w-full max-w-1500 h-8 rounded-full bg-gray-200 overflow-hidden shadow-inner relative ease-linear">
+            <div className="w-full px-6 pt-6">
+                <div className="max-w-7xl mx-auto">
+                    <div className="w-full h-3 rounded-full bg-gray-200/60 overflow-hidden shadow-sm border border-gray-200/40">
                         <div
-                            className="h-full bg-emerald-500 origin-center rounded-full transition-transform duration-1000 ease-linear"
-                            style={{
-                                transform: `scaleX(${progress})`,
-                            }}
+                            className="h-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 rounded-full transition-all duration-1000 ease-linear shadow-lg"
+                            style={{ transform: `scaleX(${progress})`, transformOrigin: 'left' }}
                         />
                     </div>
                 </div>
             </div>
 
             {/* MAIN AREA */}
-            <div className="flex-1 flex">
-                <div className="w-full h-full p-8 relative">
-                    <div className="w-full h-full bg-gray-300 rounded-2xl shadow-inner relative">
-                        <div className="absolute bottom-4 right-4 w-[340px]">
-                            <CameraPanel />
+            <div className="flex-1 flex px-6 py-4">
+                <div className="w-full max-w-7xl mx-auto">
+                    <div className="w-full h-full bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden relative backdrop-blur-sm">
+                        
+                        {/* Decorative gradient corners */}
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-100/30 to-transparent rounded-full blur-3xl -z-10" />
+                        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-100/20 to-transparent rounded-full blur-3xl -z-10" />
+
+                        <div className="relative z-10 flex flex-col h-full p-8 md:p-12">
+                            
+                            {/* HEADER SECTION */}
+                            <div className="mb-6">
+                               <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 to-emerald-700 
+                                    bg-clip-text text-transparent mb-4 pt-4 pb-2">
+                                    ¿Qué algoritmo te gusta?
+                                </h2>
+                                <div className="h-1 w-100 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" />
+                            </div>
+
+                            {/* CONTENT GRID */}
+                            <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                                
+                                {/* LEFT - Widget & Message */}
+                                <div className="lg:col-span-2 space-y-4">
+                                    {/* Agent Message Display */}
+                                   
+
+                                  <div className="rounded-2xl bg-gradient-to-br from-slate-100/50 to-slate-50/50 
+                                        p-6 border border-slate-200/50 shadow-sm 
+                                        flex justify-center items-center min-h-[430px]">
+                                        
+                                        <div id="widgetArea" className="flex justify-center items-center" />
+                                    </div>
+                                </div>
+
+                                {/* RIGHT - Camera */}
+                                <div className="flex flex-col items-center justify-center">
+                                    <div className="w-full rounded-2xl overflow-hidden shadow-lg border-4 border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-blue-500/10">
+                                        <CameraPanel />
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-4 text-center">Cámara en vivo</p>
+                                </div>
+
+                            </div>
+
+                            {/* INFO CARDS */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/30 p-4 border border-emerald-200/40">
+                                    <h4 className="font-semibold text-emerald-700 mb-1 text-sm">Conversación en vivo</h4>
+                                    <p className="text-xs text-emerald-600">Interactúa con IA mediante voz</p>
+                                </div>
+                                <div className="rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/30 p-4 border border-blue-200/40">
+                                    <h4 className="font-semibold text-blue-700 mb-1 text-sm">Feedback instantáneo</h4>
+                                    <p className="text-xs text-blue-600">Respuestas en tiempo real</p>
+                                </div>
+                                <div className="rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/30 p-4 border border-purple-200/40">
+                                    <h4 className="font-semibold text-purple-700 mb-1 text-sm">Cronometrado</h4>
+                                    <p className="text-xs text-purple-600">{INITIAL_SECONDS} segundos por sesión</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* BOTTOM BAR WITH BUTTONS */}
-            <div className="border-t border-gray-200 bg-white">
-                <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-                    {/* Home button (left) */}
+            {/* BOTTOM BAR */}
+            <div className="border-t border-gray-200/50 bg-white/80 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
                     <button
                         type="button"
                         onClick={() => navigate('/')}
-                        className="inline-flex items-center justify-center rounded-xl border border-black px-4 py-2 text-sm font-semibold bg-black text-white hover:bg-neutral-800 transition"
+                        className="inline-flex items-center justify-center rounded-lg border-2 border-slate-900 px-5 py-2.5 text-sm font-bold bg-white text-slate-900 hover:bg-slate-900 hover:text-white transition shadow-sm"
                     >
                         Home
                     </button>
 
-                    {/* Center Start / countdown button */}
                     <div className="flex-1 flex justify-center items-center">
                         <button
                             type="button"
                             onClick={handleStartClick}
-                            className="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 text-white text-lg font-semibold shadow-sm hover:bg-green-600 transition disabled:opacity-60"
+                            className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 text-white text-2xl font-bold shadow-xl hover:shadow-2xl hover:from-emerald-500 hover:to-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed border-2 border-emerald-300/50"
                             disabled={isRunning}
                         >
                             {secondsLeft}
                         </button>
                     </div>
 
-                    {/* Next button (right) */}
                     <button
                         type="button"
                         onClick={() => navigate('/next')}
-                        className="inline-flex items-center justify-center rounded-xl border border-black px-4 py-2 text-sm font-semibold bg-black text-white hover:bg-neutral-800 transition"
+                        className="inline-flex items-center justify-center rounded-lg border-2 border-slate-900 px-5 py-2.5 text-sm font-bold bg-white text-slate-900 hover:bg-slate-900 hover:text-white transition shadow-sm"
                     >
                         Next
                     </button>
