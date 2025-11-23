@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CameraPanel from '../components/CameraPanel.jsx'
 
+
 const INITIAL_SECONDS = 15
 
 function BlankPage() {
@@ -24,21 +25,21 @@ function BlankPage() {
 
                 const widget = document.createElement("elevenlabs-convai")
                 widget.setAttribute("agent-id", "agent_2601kar32vt7eb288b41ttpb0fvp")
-                widget.setAttribute("style", "position:relative; width:300px; height:400px;")
+                widget.setAttribute("style", "position:absolute; top: 300px; right: 100px; width:300px; height:400px; ")
 
                 widget.addEventListener("ready", () => {
                     console.log("Widget listo!");
                 });
 
                 widget.addEventListener("conversation-item-added", (event) => {
-                    const text = event.detail?.item?.formatted?.text;
-                    console.log("📩 EVENTO conversation-item-added:", event.detail);
-                    console.log("📝 TEXTO DETECTADO:", text);
+                    const text = event.detail?.output?.formatted?.text;
 
                     if (text) {
+                        console.log("🟢 Texto en tiempo real:", text);
                         setAgentMessage(text);
                     }
                 });
+
 
                 container.appendChild(widget)
             }
@@ -70,7 +71,7 @@ function BlankPage() {
     const progress = secondsLeft / INITIAL_SECONDS
 
     return (
-        <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-emerald-50 text-black overflow-hidden">
+        <div className="w-screen min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-emerald-50 text-black overflow-hidden">
             
             {/* TOP PROGRESS BAR */}
             <div className="w-full px-6 pt-6">
@@ -85,23 +86,19 @@ function BlankPage() {
             </div>
 
             {/* MAIN AREA */}
-            <div className="flex-1 flex px-6 py-4">
+            <div className="flex px-6 py-4">
                 <div className="w-full max-w-7xl mx-auto">
-                    <div className="w-full h-full bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden relative backdrop-blur-sm">
+                    <div className="w-full bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden relative backdrop-blur-sm">
                         
                         {/* Decorative gradient corners */}
                         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-100/30 to-transparent rounded-full blur-3xl -z-10" />
                         <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-100/20 to-transparent rounded-full blur-3xl -z-10" />
 
-                        <div className="relative z-10 flex flex-col h-full p-8 md:p-12">
+                        <div className="relative z-10 flex flex-col p-8 md:p-12">
                             
                             {/* HEADER SECTION */}
                             <div className="mb-6">
-                               <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 to-emerald-700 
-                                    bg-clip-text text-transparent mb-4 pt-4 pb-2">
-                                    ¿Qué algoritmo te gusta?
-                                </h2>
-                                <div className="h-1 w-100 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" />
+                               
                             </div>
 
                             {/* CONTENT GRID */}
@@ -110,14 +107,24 @@ function BlankPage() {
                                 {/* LEFT - Widget & Message */}
                                 <div className="lg:col-span-2 space-y-4">
                                     {/* Agent Message Display */}
-                                   
+                                    {agentMessage && (
+                                        <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-6 border border-emerald-200/60 shadow-sm hover:shadow-md transition">
+                                            <p className="text-sm font-semibold text-emerald-700 mb-3 uppercase tracking-wide">Respuesta del Agente</p>
+                                            <p className="text-lg text-slate-700 leading-relaxed font-medium">
+                                                {agentMessage}
+                                            </p>
+                                        </div>
+                                    )}
 
-                                  <div className="rounded-2xl bg-gradient-to-br from-slate-100/50 to-slate-50/50 
-                                        p-6 border border-slate-200/50 shadow-sm 
-                                        flex justify-center items-center min-h-[430px]">
-                                        
-                                        <div id="widgetArea" className="flex justify-center items-center" />
-                                    </div>
+                                    {/* Widget Area */}
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-100/50 to-slate-50/50 p-6 border border-slate-200/50 shadow-sm">
+                                         <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 to-emerald-700 bg-clip-text text-transparent mb-2 px-9 py-3">
+                                    ¿Qué algoritmo te gusta?
+                                    </h2>
+                                    
+                                    <div className="h-1 w-180 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" />
+                                            
+                                        </div>
                                 </div>
 
                                 {/* RIGHT - Camera */}
@@ -126,12 +133,13 @@ function BlankPage() {
                                         <CameraPanel />
                                     </div>
                                     <p className="text-xs text-slate-500 mt-4 text-center">Cámara en vivo</p>
+                                    <div id="widgetArea" className="flex justify-center" />
                                 </div>
 
                             </div>
 
                             {/* INFO CARDS */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-35">
                                 <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/30 p-4 border border-emerald-200/40">
                                     <h4 className="font-semibold text-emerald-700 mb-1 text-sm">Conversación en vivo</h4>
                                     <p className="text-xs text-emerald-600">Interactúa con IA mediante voz</p>
