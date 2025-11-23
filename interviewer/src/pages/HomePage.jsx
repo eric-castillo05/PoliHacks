@@ -10,7 +10,7 @@ function HomePage() {
             Project Spotlight
           </p>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            Interviewer: streamline your technical interviews.
+            HireLabs: streamline your technical interviews.
           </h1>
           <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto">
             Interviewer helps teams run consistent, fair, and data-driven technical interviews.
@@ -51,7 +51,7 @@ function HomePage() {
         </div>
 
         <p className="text-xs text-slate-500 text-center">
-          Click the button to navigate to a blank page where you can build the next step.
+          Click the button to start a free demo
         </p>
       </div>
 
